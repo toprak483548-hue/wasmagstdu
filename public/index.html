@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#087f68">
+  <meta name="description" content="Mesaj — gerçek zamanlı sohbet, grup mesajları ve durum paylaşımı.">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="stylesheet" href="/style.css">
+  <title>Mesaj — Sohbet</title>
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <section id="authView" class="auth-screen">
+    <div class="auth-decoration"></div>
+    <div class="auth-card">
+      <div class="brand-lockup"><div class="brand-mark">m</div><div><div class="brand-name">mesaj</div><div class="brand-caption">Yakınlarınla, anında.</div></div></div>
+      <div class="auth-intro"><h1>Bağlantıda kal.</h1><p>Mesajlaş, paylaş, konuş. Hepsi tek yerde.</p></div>
+      <form id="authForm" class="auth-form">
+        <label id="displayNameField" class="field hidden">Adın<input id="displayName" maxlength="40" autocomplete="name" placeholder="Ad Soyad"></label>
+        <label class="field">Kullanıcı adı<input id="username" maxlength="24" autocomplete="username" placeholder="kullaniciadi" required></label>
+        <label class="field">Şifre<input id="password" type="password" minlength="10" maxlength="72" autocomplete="current-password" placeholder="En az 10 karakter" required></label>
+        <p id="authError" class="form-error" aria-live="polite"></p>
+        <button id="authSubmit" class="btn btn-primary btn-wide" type="submit">Giriş yap</button>
+      </form>
+      <p class="auth-switch"><span id="authSwitchText">Henüz hesabın yok mu?</span> <button id="authSwitch" class="text-button" type="button">Hesap oluştur</button></p>
+      <p class="auth-footnote">Deneme sürümüdür. Güvenlik denetimi tamamlanana kadar özel bilgi paylaşma.</p>
+    </div>
+  </section>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <header class="side-header">
+        <div class="brand-lockup compact"><div class="brand-mark">m</div><span class="brand-name">mesaj</span></div>
+        <div class="header-actions">
+          <button id="newGroupBtn" class="icon-button" type="button" title="Yeni grup" aria-label="Yeni grup">＋</button>
+          <button id="themeBtn" class="icon-button" type="button" title="Görünümü değiştir" aria-label="Görünümü değiştir">◐</button>
+          <button id="settingsBtn" class="icon-button" type="button" title="Ayarlar" aria-label="Ayarlar">⚙</button>
+        </div>
+      </header>
+      <button id="myProfileBtn" class="my-profile" type="button">
+        <div id="myAvatar" class="avatar avatar-large">M</div>
+        <div class="my-profile-copy"><strong id="myName">Hesabım</strong><span id="myHandle">@kullanici</span></div>
+        <span class="profile-more">•••</span>
+      </button>
+      <div class="side-search"><span>⌕</span><input id="searchUsers" type="search" placeholder="Kişi veya sohbet ara" autocomplete="off"><button id="clearSearchBtn" class="hidden" type="button" aria-label="Aramayı temizle">×</button></div>
+      <div id="searchResults" class="search-results hidden"></div>
+      <nav class="side-tabs" aria-label="Bölümler">
+        <button class="side-tab active" data-tab="chats" type="button"><span>▤</span> Sohbetler</button>
+        <button class="side-tab" data-tab="updates" type="button"><span>◉</span> Durumlar</button>
+        <button class="side-tab" data-tab="archived" type="button"><span>⌑</span> Arşiv</button>
+      </nav>
+      <div id="listHeading" class="list-heading"><span>SON SOHBETLER</span><button id="refreshChatsBtn" type="button" title="Yenile">↻</button></div>
+      <div id="chatList" class="chat-list"></div>
+      <div class="side-footer"><span class="secure-dot"></span> HTTPS · Uçtan uca şifreleme kapalı <span class="footer-version">BETA</span></div>
+    </aside>
+
+    <main class="main-panel">
+      <section id="welcome" class="welcome-screen">
+        <div class="welcome-art"><div class="welcome-orbit orbit-one"></div><div class="welcome-orbit orbit-two"></div><div class="welcome-bubble">m</div><span class="spark spark-one">✦</span><span class="spark spark-two">✧</span></div>
+        <h1>Mesajlaşmaya hazır mısın?</h1><p>Bir sohbet seç veya yeni bir konuşma başlat.</p>
+        <div class="welcome-tip"><span>⌁</span> Mesajların anında iletilir.</div>
+      </section>
+
+      <section id="chatView" class="chat-view hidden">
+        <header class="chat-header">
+          <button id="backBtn" class="icon-button back-button" type="button" aria-label="Sohbet listesi">‹</button>
+          <div id="chatAvatar" class="avatar">?</div>
+          <div class="chat-heading"><strong id="chatTitle">Sohbet</strong><span id="chatSubtitle">Bağlantı kuruluyor</span></div>
+          <div class="chat-header-actions">
+            <button id="chatSearchBtn" class="icon-button" type="button" title="Mesajlarda ara" aria-label="Mesajlarda ara">⌕</button>
+            <button id="audioCallBtn" class="icon-button call-button" type="button" title="Sesli ara" aria-label="Sesli ara">☎</button>
+            <button id="videoCallBtn" class="icon-button call-button" type="button" title="Görüntülü ara" aria-label="Görüntülü ara">▣</button>
+            <button id="chatMenuBtn" class="icon-button" type="button" title="Sohbet seçenekleri" aria-label="Sohbet seçenekleri">⋮</button>
+          </div>
+        </header>
+        <div id="chatSearchBar" class="chat-search-bar hidden"><input id="chatSearchInput" type="search" placeholder="Bu sohbette ara..."><button id="closeChatSearch" type="button">Kapat</button></div>
+        <div class="chat-wallpaper"><div id="messages" class="messages" aria-live="polite"></div></div>
+        <div id="typingLine" class="typing-line"></div>
+        <div id="replyBar" class="reply-bar hidden"><div><strong>Yanıtlanıyor</strong><span id="replyText"></span></div><button id="cancelReply" type="button" aria-label="Yanıtı iptal et">×</button></div>
+        <form id="sendForm" class="composer">
+          <input id="fileInput" type="file" class="hidden" accept="image/*,video/mp4,audio/*,application/pdf,.txt,.zip,.doc,.docx,.xlsx,.pptx">
+          <button id="attachBtn" class="composer-icon" type="button" title="Fotoğraf veya dosya ekle" aria-label="Dosya ekle">＋</button>
+          <button id="emojiBtn" class="composer-icon emoji-trigger" type="button" title="Emoji ekle" aria-label="Emoji ekle">☺</button>
+          <textarea id="messageInput" rows="1" maxlength="4000" placeholder="Bir mesaj yaz..."></textarea>
+          <button id="voiceBtn" class="composer-icon voice-button" type="button" title="Sesli mesaj kaydet" aria-label="Sesli mesaj kaydet">🎙</button>
+          <button id="sendBtn" class="send-button" type="submit" aria-label="Gönder">➤</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div id="modalLayer" class="modal-layer hidden">
+    <section id="profileModal" class="modal-card hidden" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+      <header class="modal-header"><div><span class="eyebrow">HESAP</span><h2 id="profileModalTitle">Profil ve ayarlar</h2></div><button class="modal-close" data-close="profileModal" type="button">×</button></header>
+      <form id="profileForm" class="modal-form">
+        <div class="profile-photo-row"><div id="profilePreview" class="avatar avatar-xl">M</div><div><strong>Profil fotoğrafı</strong><p>JPG, PNG veya WEBP · En fazla 8 MB</p><label class="btn btn-light file-label">Fotoğraf seç<input id="avatarInput" type="file" accept="image/*" hidden></label></div></div>
+        <label class="field">Görünen ad<input id="profileDisplayName" maxlength="40" required></label>
+        <label class="field">Hakkımda<textarea id="profileBio" maxlength="160" rows="3" placeholder="Kısaca kendinden bahset"></textarea></label>
+        <div class="settings-row"><div><strong>Bildirimler</strong><span>Yeni mesaj bildirimlerini aç</span></div><button id="enablePushBtn" type="button" class="btn btn-light">Etkinleştir</button></div>
+        <div class="settings-row"><div><strong>Koyu tema</strong><span>Görünüm tercihini değiştir</span></div><button id="settingsThemeBtn" type="button" class="switch-control" aria-label="Koyu temayı değiştir"><span></span></button></div>
+        <p id="profileError" class="form-error"></p>
+        <div class="modal-actions"><button id="logoutBtn" class="btn btn-danger-soft" type="button">Çıkış yap</button><button class="btn btn-primary" type="submit">Değişiklikleri kaydet</button></div>
+      </form>
+    </section>
+
+    <section id="groupModal" class="modal-card hidden" role="dialog" aria-modal="true" aria-labelledby="groupModalTitle">
+      <header class="modal-header"><div><span class="eyebrow">BİRLİKTE DAHA GÜZEL</span><h2 id="groupModalTitle">Yeni grup oluştur</h2></div><button class="modal-close" data-close="groupModal" type="button">×</button></header>
+      <form id="groupForm" class="modal-form"><label class="field">Grup adı<input id="groupName" maxlength="60" placeholder="Örn. Hafta sonu ekibi" required></label><label class="field">Katılımcı ara<input id="groupUserSearch" placeholder="Kullanıcı adı veya isim"></label><div id="groupUserResults" class="group-user-results"></div><div id="groupSelected" class="selected-users"></div><p id="groupError" class="form-error"></p><div class="modal-actions"><span id="groupCount" class="muted-text">0 kişi seçildi</span><button class="btn btn-primary" type="submit">Grubu oluştur</button></div></form>
+    </section>
+
+
+    <section id="groupInfoModal" class="modal-card hidden" role="dialog" aria-modal="true" aria-labelledby="groupInfoTitle">
+      <header class="modal-header"><div><span class="eyebrow">GRUP YÖNETİMİ</span><h2 id="groupInfoTitle">Grup bilgisi</h2></div><button class="modal-close" data-close="groupInfoModal" type="button">×</button></header>
+      <form id="groupInfoForm" class="modal-form">
+        <label class="field">Grup adı<input id="groupInfoName" maxlength="60" required></label>
+        <div class="group-info-section"><strong>Katılımcılar</strong><span id="groupInfoCount" class="muted-text"></span></div>
+        <div id="groupInfoMembers" class="group-user-results"></div>
+        <div id="groupAddArea" class="group-add-area hidden"><label class="field">Yeni katılımcı ara<input id="groupAddSearch" autocomplete="off" placeholder="Kullanıcı adı veya isim"></label><div id="groupAddResults" class="group-user-results"></div></div>
+        <p id="groupInfoError" class="form-error"></p>
+        <div class="chat-action-list"><button id="groupMuteBtn" class="chat-action-option" type="button"><span>Bildirimleri sessize al</span><span>›</span></button><button id="groupArchiveBtn" class="chat-action-option" type="button"><span>Sohbeti arşivle</span><span>›</span></button></div>
+        <div class="modal-actions"><button id="leaveGroupBtn" class="btn btn-danger-soft" type="button">Gruptan ayrıl</button><button id="saveGroupInfoBtn" class="btn btn-primary" type="submit">Kaydet</button></div>
+      </form>
+    </section>
+
+
+    <section id="chatActionsModal" class="modal-card hidden" role="dialog" aria-modal="true" aria-labelledby="chatActionsTitle">
+      <header class="modal-header"><div><span class="eyebrow">SOHBET AYARLARI</span><h2 id="chatActionsTitle">Sohbet seçenekleri</h2></div><button class="modal-close" data-close="chatActionsModal" type="button">×</button></header>
+      <div class="modal-form"><p class="muted-text">Bu sohbetin bildirimlerini yönetebilir veya sohbeti arşive taşıyabilirsin.</p>
+        <div class="chat-action-list"><button id="toggleMuteChatBtn" class="chat-action-option" type="button"><span>Bildirimleri sessize al</span><span>›</span></button><button id="archiveChatBtn" class="chat-action-option" type="button"><span>Sohbeti arşivle</span><span>›</span></button></div>
+      </div>
+    </section>
+
+    <section id="statusModal" class="modal-card hidden" role="dialog" aria-modal="true" aria-labelledby="statusModalTitle">
+      <header class="modal-header"><div><span class="eyebrow">GÜNLÜK PAYLAŞIM</span><h2 id="statusModalTitle">Durum paylaş</h2></div><button class="modal-close" data-close="statusModal" type="button">×</button></header>
+      <form id="statusForm" class="modal-form"><label class="field">Bir şeyler yaz<textarea id="statusCaption" maxlength="500" rows="4" placeholder="Aklından neler geçiyor?"></textarea></label><label class="btn btn-light file-label">Fotoğraf ekle<input id="statusImageInput" type="file" accept="image/*" hidden></label><div id="statusImageName" class="muted-text"></div><p id="statusError" class="form-error"></p><div class="modal-actions"><span class="muted-text">24 saat sonra kaybolur</span><button class="btn btn-primary" type="submit">Paylaş</button></div></form>
+    </section>
+
+    <section id="statusViewer" class="status-viewer hidden" role="dialog" aria-modal="true" aria-label="Durum görüntüleyici"><div class="status-progress"><span id="statusProgressBar"></span></div><header><div id="statusViewerAvatar" class="avatar">?</div><div><strong id="statusViewerName"></strong><small id="statusViewerTime"></small></div><button id="statusViewerClose" type="button">×</button></header><div id="statusViewerContent" class="status-viewer-content"></div><button id="statusPrev" class="status-nav prev" type="button" aria-label="Önceki durum">‹</button><button id="statusNext" class="status-nav next" type="button" aria-label="Sonraki durum">›</button></section>
+  </div>
+
+  <div id="callOverlay" class="call-overlay hidden">
+    <div class="call-panel"><div id="callAvatar" class="avatar avatar-xl">?</div><span id="callState" class="call-state">Aranıyor...</span><h2 id="callName">Kullanıcı</h2><div id="incomingActions" class="incoming-actions hidden"><button id="acceptCallBtn" class="call-action accept" type="button">☎ Kabul et</button><button id="rejectCallBtn" class="call-action reject" type="button">Reddet</button></div><div class="call-videos"><video id="remoteVideo" autoplay playsinline></video><video id="localVideo" autoplay muted playsinline></video><audio id="remoteAudio" autoplay></audio></div><div id="activeCallActions" class="call-actions hidden"><button id="muteCallBtn" class="call-action" type="button">🎙 Mikrofon</button><button id="cameraCallBtn" class="call-action" type="button">▣ Kamera</button><button id="endCallBtn" class="call-action reject" type="button">Aramayı bitir</button></div></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js" defer></script>
+</body>
+</html>
